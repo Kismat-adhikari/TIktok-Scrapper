@@ -6,12 +6,10 @@
     "urls": {
       "title": "Video URLs",
       "type": "array",
-      "description": "List of TikTok video URLs to scrape",
+      "description": "List of TikTok video URLs to scrape (e.g., https://www.tiktok.com/@username/video/1234567890)",
       "editor": "stringList",
       "default": [],
-      "prefill": [
-        "https://www.tiktok.com/@username/video/1234567890"
-      ]
+      "prefill": []
     },
     "hashtags": {
       "title": "Hashtags",
