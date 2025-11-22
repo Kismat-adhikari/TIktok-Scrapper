@@ -7,9 +7,9 @@
   "meta": {
     "templateId": "python-playwright"
   },
-  "input": "./.actor/input_schema.json",
+  "input": "./input_schema.json",
   "dockerfile": "./Dockerfile",
-  "readme": "./README.md",
+  "readme": "../README.md",
   "categories": ["SOCIAL_MEDIA"],
   "storages": {
     "dataset": {
