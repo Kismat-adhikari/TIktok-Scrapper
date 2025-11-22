@@ -3,6 +3,7 @@
 from playwright.async_api import Page
 from src.types import VideoMetadata, ProfileData, ExtractionError
 import re
+import random
 
 
 class DataExtractor:
@@ -29,7 +30,7 @@ class DataExtractor:
             
             # Navigate to profile (ultra fast)
             await page.goto(url, timeout=8000, wait_until='domcontentloaded')
-            await page.wait_for_timeout(300)  # Minimal wait
+            await page.wait_for_timeout(random.randint(250, 400))  # Random human-like delay
             
             # Extract profile data
             profile_data = await self.extract_profile_data(page, username)
@@ -71,7 +72,7 @@ class DataExtractor:
         """
         try:
             # Minimal wait for page to load - JSON is already there
-            await page.wait_for_timeout(500)  # Drastically reduced
+            await page.wait_for_timeout(random.randint(400, 650))  # Random human-like delay
             
             # Extract data from __UNIVERSAL_DATA_FOR_REHYDRATION__ JSON
             json_data = await page.evaluate('''() => {
@@ -269,7 +270,7 @@ class DataExtractor:
             # Navigate to profile page (ultra fast)
             profile_url = f"https://www.tiktok.com/@{username}"
             await page.goto(profile_url, timeout=8000, wait_until='domcontentloaded')
-            await page.wait_for_timeout(300)  # Minimal wait
+            await page.wait_for_timeout(random.randint(250, 400))  # Random human-like delay
             
             # Extract bio/description text
             bio_text = ""
