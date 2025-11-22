@@ -105,6 +105,8 @@ async def main():
         
         if skip_profiles:
             logger.info("⚡ SPEED MODE: Skipping profile scraping")
+        else:
+            logger.info("📋 FULL MODE: Scraping profiles (bio, email, social links)")
         
         # Calculate per-hashtag limit to reach total (AGGRESSIVE)
         if max_videos_total and len(hashtags) > 1:
