@@ -8,7 +8,8 @@ from src.proxy.manager import RoundRobinProxyManager
 from src.scraper.browser_pool import BrowserPool
 from src.scraper.extractor import DataExtractor
 from src.scraper.engine import ScraperEngine
-from src.types import BrowserOptions, ScraperOptions, ProxyConfig
+from src.types import BrowserOptions, ScraperOptions, ProxyConfig, ScrapingResult
+from playwright.async_api import async_playwright
 
 # Configure logging
 logging.basicConfig(
@@ -93,59 +94,75 @@ async def main():
         # Use Apify proxy configuration
         proxy_config = await Actor.create_proxy_configuration()
         
-        # Create proxy manager with Apify proxies
-        class ApifyProxyManager:
-            def __init__(self, proxy_config):
-                self.proxy_config = proxy_config
-                self.current_proxy = None
-            
-            def get_next_proxy(self):
-                # This will be called synchronously, so we return a cached proxy
-                # The actual proxy rotation happens in Apify's proxy configuration
-                if not self.current_proxy:
-                    # Create a dummy proxy config - Apify handles the actual proxy
-                    self.current_proxy = ProxyConfig(
-                        ip="apify-proxy",
-                        port=8000,
-                        username="auto",
-                        password="auto"
-                    )
-                return self.current_proxy
-            
-            def mark_proxy_failed(self, proxy):
-                pass  # Apify handles proxy rotation
-            
-            def force_rotation(self):
-                pass  # Apify handles proxy rotation
-            
-            def has_available_proxies(self):
-                return True
-        
-        proxy_manager = ApifyProxyManager(proxy_config)
-        
-        # Initialize browser pool
+        # Initialize browser pool WITHOUT proxy (we'll use Apify proxies per-context)
         browser_options = BrowserOptions(
             headless=True,
             block_resources=['image', 'media', 'font', 'stylesheet'],
             timeout=15000
         )
         browser_pool = BrowserPool(browser_options)
-        await browser_pool.initialize()
+        # Initialize browser without global proxy
+        browser_pool.playwright = await async_playwright().start()
+        browser_pool.browser = await browser_pool.playwright.chromium.launch(
+            headless=True,
+            args=['--disable-dev-shm-usage', '--no-sandbox']
+        )
         
         # Initialize extractor
         extractor = DataExtractor(skip_profiles=skip_profiles)
         
-        # Initialize scraper engine
-        scraper_options = ScraperOptions(
-            max_retries=1,
-            timeout=15000,
-            concurrency=concurrency
-        )
-        engine = ScraperEngine(proxy_manager, browser_pool, extractor, scraper_options)
-        
-        # Scrape all URLs
+        # Scrape all URLs with Apify proxies
         logger.info(f"Starting scraping with {concurrency} concurrent workers")
-        results = await engine.scrape_urls(all_urls, concurrency)
+        results = []
+        semaphore = asyncio.Semaphore(concurrency)
+        
+        async def scrape_single_url(url: str):
+            async with semaphore:
+                try:
+                    # Get Apify proxy for this request
+                    proxy_url = await proxy_config.new_url()
+                    logger.info(f"Scraping {url} with Apify proxy")
+                    
+                    # Create context with Apify proxy
+                    context = await browser_pool.browser.new_context(
+                        proxy={"server": proxy_url},
+                        user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                        viewport={"width": 1920, "height": 1080}
+                    )
+                    context.set_default_timeout(15000)
+                    
+                    # Block resources
+                    async def block_resources(route):
+                        resource_type = route.request.resource_type
+                        if resource_type in ['image', 'media', 'font', 'stylesheet']:
+                            await route.abort()
+                        else:
+                            await route.continue_()
+                    await context.route("**/*", block_resources)
+                    
+                    try:
+                        page = await context.new_page()
+                        await page.goto(url, wait_until='domcontentloaded', timeout=15000)
+                        
+                        # Extract metadata
+                        if '/video/' in url:
+                            metadata = await extractor.extract_metadata(page, url)
+                        else:
+                            metadata = await extractor.extract_profile_only(page, url)
+                        
+                        logger.info(f"✓ Successfully scraped {url}")
+                        results.append(ScrapingResult(success=True, url=url, proxy_used=proxy_url, retry_count=0, data=metadata))
+                    finally:
+                        await context.close()
+                        
+                except Exception as e:
+                    logger.error(f"✗ Failed to scrape {url}: {e}")
+                    results.append(ScrapingResult(success=False, url=url, proxy_used="", retry_count=0, error=str(e)))
+        
+        # Scrape all URLs concurrently
+        from playwright.async_api import async_playwright
+        tasks = [scrape_single_url(url) for url in all_urls]
+        await asyncio.gather(*tasks, return_exceptions=True)
         
         # Push results to Apify dataset
         success_count = 0
