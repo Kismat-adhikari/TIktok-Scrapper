@@ -277,8 +277,8 @@ class DataExtractor:
             except:
                 pass
             
-            # Save bio text
-            profile_data.bio = bio_text
+            # Save bio text (set default message if empty)
+            profile_data.bio = bio_text if bio_text else "Bio is empty"
             
             # Extract email from bio using regex
             if bio_text:
