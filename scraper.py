@@ -212,15 +212,15 @@ async def main():
     logger.info(f"   Profile URLs: {len(profile_urls)}")
     logger.info(f"   Total: {len(urls)}")
     
-    # Auto-calculate optimal concurrency based on video count (ULTRA AGGRESSIVE)
+    # Auto-calculate optimal concurrency based on video count (OPTIMIZED)
     if len(urls) <= 10:
-        concurrency = 7  # Increased from 5
+        concurrency = 5  # Sweet spot for small batches
     elif len(urls) <= 30:
-        concurrency = 15  # Increased from 10
+        concurrency = 7  # Balanced for medium batches
     elif len(urls) <= 100:
-        concurrency = 20  # Increased from 15
+        concurrency = 7  # Optimal to avoid rate limiting
     else:
-        concurrency = 25  # Increased from 20
+        concurrency = 10  # Max for large batches
     
     logger.info(f"⚡ Auto-selected concurrency: {concurrency} workers (optimized for {len(urls)} videos)")
     
