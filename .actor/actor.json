@@ -1,0 +1,40 @@
+{
+  "actorSpecification": 1,
+  "name": "tiktok-bulk-scraper",
+  "title": "TikTok Bulk Scraper",
+  "description": "Fast TikTok scraper that extracts video metadata, profiles, and hashtag content with support for bulk scraping.",
+  "version": "1.0.0",
+  "meta": {
+    "templateId": "python-playwright"
+  },
+  "input": "./.actor/input_schema.json",
+  "dockerfile": "./Dockerfile",
+  "readme": "./README.md",
+  "categories": ["SOCIAL_MEDIA"],
+  "storages": {
+    "dataset": {
+      "actorSpecification": 1,
+      "title": "TikTok Videos",
+      "views": {
+        "overview": {
+          "title": "Overview",
+          "transformation": {
+            "fields": [
+              "video_url",
+              "username",
+              "caption",
+              "likes",
+              "comments_count",
+              "share_count",
+              "hashtags"
+            ]
+          },
+          "display": {
+            "component": "table",
+            "properties": {}
+          }
+        }
+      }
+    }
+  }
+}

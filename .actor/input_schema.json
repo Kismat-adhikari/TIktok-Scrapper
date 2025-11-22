@@ -1,0 +1,50 @@
+{
+  "title": "TikTok Bulk Scraper Input",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "urls": {
+      "title": "Video URLs",
+      "type": "array",
+      "description": "List of TikTok video URLs to scrape",
+      "editor": "stringList",
+      "default": [],
+      "prefill": [
+        "https://www.tiktok.com/@username/video/1234567890"
+      ]
+    },
+    "hashtags": {
+      "title": "Hashtags",
+      "type": "array",
+      "description": "List of hashtags to scrape videos from (without # symbol)",
+      "editor": "stringList",
+      "default": [],
+      "prefill": [
+        "fyp",
+        "viral"
+      ]
+    },
+    "maxVideos": {
+      "title": "Max Videos",
+      "type": "integer",
+      "description": "Maximum number of videos to scrape (per hashtag if multiple hashtags provided)",
+      "default": 100,
+      "minimum": 1,
+      "maximum": 1000
+    },
+    "skipProfiles": {
+      "title": "Skip Profile Scraping",
+      "type": "boolean",
+      "description": "Skip scraping profile data (bio, email, social links) for faster scraping",
+      "default": true
+    },
+    "concurrency": {
+      "title": "Concurrency",
+      "type": "integer",
+      "description": "Number of concurrent workers (1-10 recommended)",
+      "default": 7,
+      "minimum": 1,
+      "maximum": 25
+    }
+  }
+}

@@ -18,3 +18,14 @@ output.csv
 .hypothesis/
 htmlcov/
 .coverage
+
+# Apify local storage
+apify_storage/
+storage/
+*.csv
+*.html
+*.png
+speed_test_*.py
+test_*.py
+benchmark_*.py
+diagnose_*.py
