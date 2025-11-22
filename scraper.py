@@ -85,16 +85,17 @@ async def main():
         else:
             hashtags = [hashtag_input]
         
-        max_videos_input = input("Max videos TOTAL across all hashtags (Enter for unlimited): ").strip()
-        max_videos_total = None
+        max_videos_input = input("Max videos TOTAL across all hashtags (default is 10): ").strip()
+        max_videos_total = 10  # Default value
         if max_videos_input:
             try:
                 max_videos_total = int(max_videos_input)
                 if max_videos_total < 1:
-                    max_videos_total = None
+                    logger.warning("⚠️  Invalid number, using default (10)")
+                    max_videos_total = 10
             except:
-                logger.warning("⚠️  Invalid number, using unlimited")
-                max_videos_total = None
+                logger.warning("⚠️  Invalid number, using default (10)")
+                max_videos_total = 10
         
         # Ask about profile scraping (SPEED BOOST)
         print("\n⚡ Profile scraping (bio, email, social links)?")
