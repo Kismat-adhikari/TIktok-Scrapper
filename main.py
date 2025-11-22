@@ -160,7 +160,6 @@ async def main():
                     results.append(ScrapingResult(success=False, url=url, proxy_used="", retry_count=0, error=str(e)))
         
         # Scrape all URLs concurrently
-        from playwright.async_api import async_playwright
         tasks = [scrape_single_url(url) for url in all_urls]
         await asyncio.gather(*tasks, return_exceptions=True)
         
