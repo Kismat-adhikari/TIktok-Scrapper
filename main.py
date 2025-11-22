@@ -48,7 +48,8 @@ async def main():
             browser_pool = BrowserPool(browser_options)
             await browser_pool.initialize()
             
-            hashtag_scraper = HashtagScraper(browser_pool)
+            # Initialize hashtag scraper (no arguments needed)
+            hashtag_scraper = HashtagScraper()
             
             for hashtag in hashtags:
                 logger.info(f"Collecting videos from #{hashtag}")
@@ -56,23 +57,23 @@ async def main():
                     # Use Apify proxy
                     proxy_url = await proxy_config.new_url()
                     
-                    # Create a ProxyConfig from Apify proxy URL
-                    # Parse proxy URL format: http://username:password@host:port
-                    from urllib.parse import urlparse
-                    parsed = urlparse(proxy_url)
-                    
-                    proxy = ProxyConfig(
-                        ip=parsed.hostname,
-                        port=parsed.port,
-                        username=parsed.username or '',
-                        password=parsed.password or ''
+                    # Create browser context with proxy
+                    context = await browser_pool.browser.new_context(
+                        proxy={
+                            "server": proxy_url
+                        }
                     )
                     
+                    # Scrape hashtag with context
                     hashtag_urls = await hashtag_scraper.scrape_hashtag(
+                        context=context,
                         hashtag=hashtag,
                         max_videos=max_videos // len(hashtags) if len(hashtags) > 1 else max_videos,
-                        proxy=proxy
+                        proxy_str=proxy_url
                     )
+                    
+                    await context.close()
+                    
                     all_urls.extend(hashtag_urls)
                     logger.info(f"Collected {len(hashtag_urls)} URLs from #{hashtag}")
                 except Exception as e:
