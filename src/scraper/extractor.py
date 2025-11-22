@@ -102,7 +102,14 @@ class DataExtractor:
                     
                     # Extract profile data (optional for speed)
                     if self.skip_profiles:
-                        profile_data = ProfileData()  # Empty profile data
+                        profile_data = ProfileData(
+                            bio="Profile scraping skipped",
+                            email="Profile scraping skipped",
+                            instagram_link="Profile scraping skipped",
+                            youtube_link="Profile scraping skipped",
+                            twitter_link="Profile scraping skipped",
+                            other_links="Profile scraping skipped"
+                        )
                     else:
                         profile_data = await self.extract_profile_data(page, username)
                     
@@ -149,7 +156,14 @@ class DataExtractor:
             
             # Extract profile data (optional for speed)
             if self.skip_profiles:
-                profile_data = ProfileData()  # Empty profile data
+                profile_data = ProfileData(
+                    bio="Profile scraping skipped",
+                    email="Profile scraping skipped",
+                    instagram_link="Profile scraping skipped",
+                    youtube_link="Profile scraping skipped",
+                    twitter_link="Profile scraping skipped",
+                    other_links="Profile scraping skipped"
+                )
             else:
                 profile_data = await self.extract_profile_data(page, username or "unknown")
             
