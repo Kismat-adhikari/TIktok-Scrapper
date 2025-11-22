@@ -22,7 +22,9 @@ https://www.tiktok.com/@username/video/1234567890
 https://www.tiktok.com/@another/video/9876543210
 ```
 
-### Hashtags
+### Hashtags (Experimental)
+⚠️ **Note**: Hashtag scraping is currently being blocked by TikTok's anti-bot protection on Apify infrastructure. For reliable results, use direct video URLs instead.
+
 List of hashtags to scrape videos from (without # symbol).
 
 Example:
@@ -75,10 +77,11 @@ Each scraped video includes:
 
 ## Tips
 
-1. Use `skipProfiles: true` for maximum speed
-2. Keep concurrency at 5-10 for best results
-3. TikTok limits hashtag scraping to ~150-300 videos per hashtag
-4. Use multiple hashtags to collect more videos
+1. **Use direct video URLs** for most reliable results
+2. Use `skipProfiles: true` for maximum speed
+3. Keep concurrency at 5-10 for best results
+4. Hashtag scraping may not work due to TikTok's anti-bot measures
+5. Provide real TikTok video URLs in the format: `https://www.tiktok.com/@username/video/VIDEO_ID`
 
 ## Support
 

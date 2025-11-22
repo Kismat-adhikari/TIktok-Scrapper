@@ -12,15 +12,12 @@
       "prefill": []
     },
     "hashtags": {
-      "title": "Hashtags",
+      "title": "Hashtags (Experimental)",
       "type": "array",
-      "description": "List of hashtags to scrape videos from (without # symbol)",
+      "description": "⚠️ Hashtag scraping may be blocked by TikTok. Use direct video URLs for reliable results. List hashtags without # symbol (e.g., 'fyp', 'viral')",
       "editor": "stringList",
       "default": [],
-      "prefill": [
-        "fyp",
-        "viral"
-      ]
+      "prefill": []
     },
     "maxVideos": {
       "title": "Max Videos",
