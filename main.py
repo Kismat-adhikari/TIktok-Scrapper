@@ -43,7 +43,7 @@ async def main():
             proxy_config = await Actor.create_proxy_configuration()
             
             # Initialize browser for hashtag scraping
-            browser_options = BrowserOptions(headless=True, timeout=15000)
+            browser_options = BrowserOptions(headless=True, timeout=60000)
             browser_pool = BrowserPool(browser_options)
             await browser_pool.initialize()
             
@@ -93,7 +93,7 @@ async def main():
         browser_options = BrowserOptions(
             headless=True,
             block_resources=['image', 'media', 'font', 'stylesheet'],
-            timeout=15000
+            timeout=60000
         )
         browser_pool = BrowserPool(browser_options)
         browser_pool.playwright = await async_playwright().start()
@@ -123,7 +123,7 @@ async def main():
                         user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
                         viewport={"width": 1920, "height": 1080}
                     )
-                    context.set_default_timeout(15000)
+                    context.set_default_timeout(60000)
                     
                     # Block resources
                     async def block_resources(route):
@@ -136,7 +136,7 @@ async def main():
                     
                     try:
                         page = await context.new_page()
-                        await page.goto(url, wait_until='domcontentloaded', timeout=15000)
+                        await page.goto(url, wait_until='domcontentloaded', timeout=60000)
                         
                         # Extract metadata
                         if '/video/' in url:
