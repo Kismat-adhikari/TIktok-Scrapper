@@ -32,6 +32,24 @@ async def main():
         concurrency = actor_input.get('concurrency', 5)
         custom_proxies = actor_input.get('customProxies', [])
         
+        # Convert proxy format if needed (host:port:user:pass -> http://user:pass@host:port)
+        formatted_proxies = []
+        for proxy in custom_proxies:
+            if proxy.startswith('http://') or proxy.startswith('https://'):
+                formatted_proxies.append(proxy)
+            else:
+                # Parse host:port:user:pass format
+                parts = proxy.split(':')
+                if len(parts) == 4:
+                    host, port, user, password = parts
+                    formatted_proxies.append(f"http://{user}:{password}@{host}:{port}")
+                elif len(parts) == 2:
+                    formatted_proxies.append(f"http://{proxy}")
+                else:
+                    logger.warning(f"Invalid proxy format: {proxy}")
+        
+        custom_proxies = formatted_proxies if formatted_proxies else custom_proxies
+        
         logger.info(f"Starting TikTok scraper with {len(urls)} URLs and {len(hashtags)} hashtags")
         
         # Collect URLs from hashtags if provided
