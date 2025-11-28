@@ -150,6 +150,13 @@ async def main():
                             # If JSON not found, wait a bit and continue anyway
                             await page.wait_for_timeout(3000)
                         
+                        # Debug: Check page content
+                        page_content = await page.content()
+                        if 'captcha' in page_content.lower():
+                            logger.warning(f"Captcha detected on {url}")
+                        if '__UNIVERSAL_DATA_FOR_REHYDRATION__' not in page_content:
+                            logger.warning(f"JSON data not found on {url}, page might be blocked")
+                        
                         # Extract metadata
                         if '/video/' in url:
                             metadata = await extractor.extract_metadata(page, url)
