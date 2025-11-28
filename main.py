@@ -142,18 +142,19 @@ async def main():
         logger.info(f"Starting scraping with {concurrency} concurrent workers")
         results = []
         semaphore = asyncio.Semaphore(concurrency)
+        proxy_counter = {'index': 0}  # Use dict to share state
         
         async def scrape_single_url(url: str):
-            nonlocal proxy_index
             async with semaphore:
                 try:
                     # Get proxy for this request
                     if custom_proxies:
-                        proxy_url = custom_proxies[proxy_index % len(custom_proxies)]
-                        proxy_index += 1
+                        proxy_url = custom_proxies[proxy_counter['index'] % len(custom_proxies)]
+                        proxy_counter['index'] += 1
+                        logger.info(f"Scraping {url} with proxy {proxy_counter['index'] % len(custom_proxies) + 1}/{len(custom_proxies)}")
                     else:
                         proxy_url = await proxy_config.new_url()
-                    logger.info(f"Scraping {url}")
+                        logger.info(f"Scraping {url}")
                     
                     # Create context with Apify proxy
                     context = await browser_pool.browser.new_context(
