@@ -30,6 +30,7 @@ async def main():
         max_videos = actor_input.get('maxVideos', 100)
         skip_profiles = actor_input.get('skipProfiles', False)
         concurrency = actor_input.get('concurrency', 5)
+        custom_proxies = actor_input.get('customProxies', [])
         
         logger.info(f"Starting TikTok scraper with {len(urls)} URLs and {len(hashtags)} hashtags")
         
@@ -39,8 +40,13 @@ async def main():
         if hashtags:
             from src.scraper.hashtag_scraper import HashtagScraper
             
-            # Get Apify proxy configuration
-            proxy_config = await Actor.create_proxy_configuration()
+            # Setup proxy configuration
+            if custom_proxies:
+                logger.info(f"Using {len(custom_proxies)} custom proxies")
+                proxy_index = 0
+            else:
+                proxy_config = await Actor.create_proxy_configuration()
+                logger.info("Using Apify proxies")
             
             # Initialize browser for hashtag scraping
             browser_options = BrowserOptions(headless=True, timeout=60000)
@@ -53,8 +59,12 @@ async def main():
             for hashtag in hashtags:
                 logger.info(f"Collecting videos from #{hashtag}")
                 try:
-                    # Use Apify proxy
-                    proxy_url = await proxy_config.new_url()
+                    # Get proxy
+                    if custom_proxies:
+                        proxy_url = custom_proxies[proxy_index % len(custom_proxies)]
+                        proxy_index += 1
+                    else:
+                        proxy_url = await proxy_config.new_url()
                     
                     # Create browser context with proxy
                     context = await browser_pool.browser.new_context(
@@ -86,8 +96,13 @@ async def main():
             logger.warning("No URLs to scrape")
             return
         
-        # Get Apify proxy configuration
-        proxy_config = await Actor.create_proxy_configuration()
+        # Setup proxy configuration
+        if custom_proxies:
+            logger.info(f"Using {len(custom_proxies)} custom proxies for scraping")
+            proxy_index = 0
+        else:
+            proxy_config = await Actor.create_proxy_configuration()
+            logger.info("Using Apify proxies for scraping")
         
         # Initialize browser pool
         browser_options = BrowserOptions(
@@ -111,10 +126,15 @@ async def main():
         semaphore = asyncio.Semaphore(concurrency)
         
         async def scrape_single_url(url: str):
+            nonlocal proxy_index
             async with semaphore:
                 try:
-                    # Get Apify proxy for this request
-                    proxy_url = await proxy_config.new_url()
+                    # Get proxy for this request
+                    if custom_proxies:
+                        proxy_url = custom_proxies[proxy_index % len(custom_proxies)]
+                        proxy_index += 1
+                    else:
+                        proxy_url = await proxy_config.new_url()
                     logger.info(f"Scraping {url}")
                     
                     # Create context with Apify proxy

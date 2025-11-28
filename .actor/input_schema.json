@@ -40,6 +40,14 @@
       "default": 5,
       "minimum": 1,
       "maximum": 20
+    },
+    "customProxies": {
+      "title": "Custom Proxies",
+      "type": "array",
+      "description": "Your own proxy list (format: http://user:pass@host:port or http://host:port). Leave empty to use Apify proxies.",
+      "editor": "stringList",
+      "default": [],
+      "prefill": []
     }
   }
 }
