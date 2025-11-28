@@ -136,7 +136,15 @@ async def main():
                     
                     try:
                         page = await context.new_page()
-                        await page.goto(url, wait_until='domcontentloaded', timeout=60000)
+                        
+                        # Try with networkidle first, fallback to domcontentloaded
+                        try:
+                            await page.goto(url, wait_until='networkidle', timeout=30000)
+                        except:
+                            await page.goto(url, wait_until='domcontentloaded', timeout=30000)
+                        
+                        # Wait for TikTok content to load
+                        await page.wait_for_timeout(2000)
                         
                         # Extract metadata
                         if '/video/' in url:

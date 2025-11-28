@@ -8,8 +8,8 @@
       "type": "array",
       "description": "List of TikTok video URLs to scrape",
       "editor": "stringList",
-      "default": [],
-      "prefill": []
+      "default": ["https://www.tiktok.com/@focus.and.fly/video/7577015973245373718"],
+      "prefill": ["https://www.tiktok.com/@focus.and.fly/video/7577015973245373718"]
     },
     "hashtags": {
       "title": "Hashtags",
