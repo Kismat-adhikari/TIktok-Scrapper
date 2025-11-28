@@ -280,20 +280,23 @@ class DataExtractor:
                     '[data-e2e="user-bio"]',
                     'h2[data-e2e="user-subtitle"]',
                     '[class*="bio"]',
-                    '[class*="description"]'
+                    '[class*="description"]',
+                    'h2[class*="subtitle"]',
+                    'div[class*="bio"]',
+                    'span[class*="bio"]'
                 ]
                 
                 for selector in bio_selectors:
                     bio_element = await page.query_selector(selector)
                     if bio_element:
                         bio_text = await bio_element.inner_text()
-                        if bio_text:
+                        if bio_text and bio_text.strip():
                             break
             except:
                 pass
             
-            # Save bio text (set default message if empty)
-            profile_data.bio = bio_text if bio_text else "Bio is empty"
+            # Save bio text (keep empty if truly empty, don't add placeholder)
+            profile_data.bio = bio_text.strip() if bio_text else ""
             
             # Extract email from bio using regex
             if bio_text:

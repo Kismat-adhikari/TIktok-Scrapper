@@ -1,8 +1,3 @@
-# Git
-.git
-.gitignore
-
-# Python
 __pycache__
 *.pyc
 *.pyo
@@ -13,37 +8,21 @@ __pycache__
 *.egg-info
 dist
 build
-
-# Virtual environments
-venv
-env
-ENV
-
-# IDE
+.git
+.gitignore
 .vscode
 .idea
-*.swp
-*.swo
-
-# Test files
-test_*.py
-*_test.py
-tests/
-pytest.ini
-
-# Output files
 *.csv
-*.json
 *.html
 *.png
-
-# Logs
-*.log
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Apify storage (local development)
-apify_storage
-storage
+*.md
+tests/
+test_*.py
+speed_test_*.py
+debug_*.html
+debug_*.png
+proof_*.csv
+scraped_*.csv
+output_*.csv
+urls.txt
+proxies.txt

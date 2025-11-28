@@ -6,23 +6,23 @@
     "urls": {
       "title": "Video URLs",
       "type": "array",
-      "description": "List of TikTok video URLs to scrape (e.g., https://www.tiktok.com/@username/video/1234567890)",
+      "description": "List of TikTok video URLs to scrape",
       "editor": "stringList",
       "default": [],
       "prefill": []
     },
     "hashtags": {
-      "title": "Hashtags (Experimental)",
+      "title": "Hashtags",
       "type": "array",
-      "description": "⚠️ Hashtag scraping may be blocked by TikTok. Use direct video URLs for reliable results. List hashtags without # symbol (e.g., 'fyp', 'viral')",
+      "description": "List of hashtags to scrape videos from (without # symbol)",
       "editor": "stringList",
       "default": [],
       "prefill": []
     },
     "maxVideos": {
-      "title": "Max Videos",
+      "title": "Max Videos per Hashtag",
       "type": "integer",
-      "description": "Maximum number of videos to scrape (per hashtag if multiple hashtags provided)",
+      "description": "Maximum number of videos to collect from each hashtag",
       "default": 100,
       "minimum": 1,
       "maximum": 1000
@@ -30,16 +30,16 @@
     "skipProfiles": {
       "title": "Skip Profile Scraping",
       "type": "boolean",
-      "description": "Skip scraping profile data (bio, email, social links) for faster scraping",
-      "default": true
+      "description": "Skip profile data extraction for faster scraping (bio, email, social links)",
+      "default": false
     },
     "concurrency": {
       "title": "Concurrency",
       "type": "integer",
-      "description": "Number of concurrent workers (1-10 recommended)",
-      "default": 7,
+      "description": "Number of concurrent browser contexts (higher = faster but more resources)",
+      "default": 5,
       "minimum": 1,
-      "maximum": 25
+      "maximum": 20
     }
   }
 }

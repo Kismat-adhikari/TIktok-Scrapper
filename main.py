@@ -4,11 +4,9 @@ import asyncio
 import logging
 from apify import Actor
 from src.config.loader import ConfigLoader
-from src.proxy.manager import RoundRobinProxyManager
 from src.scraper.browser_pool import BrowserPool
 from src.scraper.extractor import DataExtractor
-from src.scraper.engine import ScraperEngine
-from src.types import BrowserOptions, ScraperOptions, ProxyConfig, ScrapingResult
+from src.types import BrowserOptions, ScrapingResult
 from playwright.async_api import async_playwright
 
 # Configure logging
@@ -30,8 +28,8 @@ async def main():
         urls = actor_input.get('urls', [])
         hashtags = actor_input.get('hashtags', [])
         max_videos = actor_input.get('maxVideos', 100)
-        skip_profiles = actor_input.get('skipProfiles', True)
-        concurrency = actor_input.get('concurrency', 7)
+        skip_profiles = actor_input.get('skipProfiles', False)
+        concurrency = actor_input.get('concurrency', 5)
         
         logger.info(f"Starting TikTok scraper with {len(urls)} URLs and {len(hashtags)} hashtags")
         
@@ -49,7 +47,7 @@ async def main():
             browser_pool = BrowserPool(browser_options)
             await browser_pool.initialize()
             
-            # Initialize hashtag scraper (no arguments needed)
+            # Initialize hashtag scraper
             hashtag_scraper = HashtagScraper()
             
             for hashtag in hashtags:
@@ -60,9 +58,7 @@ async def main():
                     
                     # Create browser context with proxy
                     context = await browser_pool.browser.new_context(
-                        proxy={
-                            "server": proxy_url
-                        }
+                        proxy={"server": proxy_url}
                     )
                     
                     # Scrape hashtag with context
@@ -90,18 +86,16 @@ async def main():
             logger.warning("No URLs to scrape")
             return
         
-        # Initialize scraper components
-        # Use Apify proxy configuration
+        # Get Apify proxy configuration
         proxy_config = await Actor.create_proxy_configuration()
         
-        # Initialize browser pool WITHOUT proxy (we'll use Apify proxies per-context)
+        # Initialize browser pool
         browser_options = BrowserOptions(
             headless=True,
             block_resources=['image', 'media', 'font', 'stylesheet'],
             timeout=15000
         )
         browser_pool = BrowserPool(browser_options)
-        # Initialize browser without global proxy
         browser_pool.playwright = await async_playwright().start()
         browser_pool.browser = await browser_pool.playwright.chromium.launch(
             headless=True,
@@ -121,7 +115,7 @@ async def main():
                 try:
                     # Get Apify proxy for this request
                     proxy_url = await proxy_config.new_url()
-                    logger.info(f"Scraping {url} with Apify proxy")
+                    logger.info(f"Scraping {url}")
                     
                     # Create context with Apify proxy
                     context = await browser_pool.browser.new_context(

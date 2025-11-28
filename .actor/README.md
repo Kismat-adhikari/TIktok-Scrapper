@@ -1,88 +1,60 @@
 # TikTok Bulk Scraper
 
-Fast and efficient TikTok scraper that extracts video metadata, user profiles, and hashtag content.
+Fast and efficient TikTok scraper that extracts video metadata, profile information, and social media links.
 
 ## Features
 
-- 🚀 **Fast scraping** with concurrent workers (7-10 workers by default)
-- 📊 **Bulk scraping** from URLs or hashtags
-- 👤 **Profile data** including bio, email, and social links (optional)
-- 🏷️ **Hashtag scraping** to collect videos from trending hashtags
-- 📸 **Thumbnail URLs** for all videos
-- ⚡ **Real-time results** pushed to Apify dataset
+- Scrape TikTok videos by URL or hashtag
+- Extract video metadata (caption, likes, comments, shares, etc.)
+- Extract profile data (bio, email, Instagram, YouTube, Twitter links)
+- Fast concurrent scraping with Apify proxies
+- Automatic retry logic and error handling
 
 ## Input
 
-### Video URLs
-List of TikTok video URLs to scrape directly.
-
-Example:
-```
-https://www.tiktok.com/@username/video/1234567890
-https://www.tiktok.com/@another/video/9876543210
-```
-
-### Hashtags (Experimental)
-⚠️ **Note**: Hashtag scraping is currently being blocked by TikTok's anti-bot protection on Apify infrastructure. For reliable results, use direct video URLs instead.
-
-List of hashtags to scrape videos from (without # symbol).
-
-Example:
-```
-fyp
-viral
-trending
-```
-
-### Max Videos
-Maximum number of videos to scrape. If multiple hashtags are provided, this limit applies to the total across all hashtags.
-
-Default: `100`
-
-### Skip Profile Scraping
-Enable this for faster scraping (skips bio, email, social links).
-- `true` (default): ~0.7 sec/video
-- `false`: ~1.3 sec/video
-
-### Concurrency
-Number of concurrent workers (1-25).
-- Recommended: 5-10 for best performance
-- Higher values may trigger rate limiting
+- **Video URLs**: List of TikTok video URLs to scrape
+- **Hashtags**: List of hashtags to collect videos from (without # symbol)
+- **Max Videos per Hashtag**: Maximum number of videos to collect from each hashtag (default: 100)
+- **Skip Profile Scraping**: Skip profile data extraction for faster scraping (default: false)
+- **Concurrency**: Number of concurrent workers (default: 5, max: 20)
 
 ## Output
 
-Each scraped video includes:
+The actor outputs a dataset with the following fields for each video:
 
-- `video_url`: TikTok video URL
+- `video_url`: URL of the video
 - `caption`: Video caption/description
-- `hashtags`: Semicolon-separated hashtags
+- `hashtags`: Hashtags used in the video (semicolon-separated)
 - `likes`: Number of likes
 - `comments_count`: Number of comments
 - `share_count`: Number of shares
-- `username`: Creator username
+- `username`: TikTok username
 - `upload_date`: Upload timestamp
-- `thumbnail_url`: Video thumbnail image URL
-- `bio`: User bio (if profile scraping enabled)
-- `email`: Email from bio (if found)
-- `instagram_link`: Instagram link (if found)
-- `youtube_link`: YouTube link (if found)
-- `twitter_link`: Twitter link (if found)
-- `other_links`: Other social links (if found)
+- `thumbnail_url`: Video thumbnail URL
+- `bio`: User bio/description
+- `email`: Email address (if found in bio)
+- `instagram_link`: Instagram profile link
+- `youtube_link`: YouTube channel link
+- `twitter_link`: Twitter profile link
+- `other_links`: Other social media links (semicolon-separated)
 
-## Performance
+## Usage Tips
 
-- **With profile scraping disabled**: ~100 videos in 1-2 minutes
-- **With profile scraping enabled**: ~100 videos in 2-3 minutes
-- **Hashtag collection**: ~200-300 videos per hashtag (TikTok limitation)
+- For faster scraping, enable "Skip Profile Scraping"
+- Increase concurrency for faster processing (but uses more resources)
+- Use hashtags to discover and scrape trending content
+- Apify proxies are automatically used to avoid rate limiting
 
-## Tips
+## Example Input
 
-1. **Use direct video URLs** for most reliable results
-2. Use `skipProfiles: true` for maximum speed
-3. Keep concurrency at 5-10 for best results
-4. Hashtag scraping may not work due to TikTok's anti-bot measures
-5. Provide real TikTok video URLs in the format: `https://www.tiktok.com/@username/video/VIDEO_ID`
-
-## Support
-
-For issues or questions, please contact support.
+```json
+{
+  "urls": [
+    "https://www.tiktok.com/@user/video/123456789"
+  ],
+  "hashtags": ["fyp", "viral"],
+  "maxVideos": 50,
+  "skipProfiles": false,
+  "concurrency": 5
+}
+```
