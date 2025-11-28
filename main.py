@@ -143,9 +143,12 @@ async def main():
                         except:
                             await page.goto(url, wait_until='domcontentloaded', timeout=30000)
                         
-                        # Wait for TikTok JSON data to be available
-                        await page.wait_for_selector('#__UNIVERSAL_DATA_FOR_REHYDRATION__', timeout=10000)
-                        await page.wait_for_timeout(1000)
+                        # Wait for TikTok JSON data to be available (with fallback)
+                        try:
+                            await page.wait_for_selector('#__UNIVERSAL_DATA_FOR_REHYDRATION__', timeout=5000)
+                        except:
+                            # If JSON not found, wait a bit and continue anyway
+                            await page.wait_for_timeout(3000)
                         
                         # Extract metadata
                         if '/video/' in url:
